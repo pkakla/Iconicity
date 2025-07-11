@@ -284,39 +284,30 @@ function generateTrial() {
 }
 
 // === 7. Build trials for 15 minutes ===
-const estimatedTrialTime = 10000;
-const maxTrials = Math.floor((15 * 60 * 1000) / estimatedTrialTime);
-for (let i = 0; i < maxTrials; i++) {
+// Allow for many trials and stop the experiment strictly after 15 minutes
+for (let i = 0; i < 9999; i++) {
   timeline.push(generateTrial());
 }
-
-// === 7.5: Save data to Google Sheets ===
-timeline.push({
-  type: "call-function",
-  func: function () {
-    const data = jsPsych.data.get().csv(); // Or `.json()` or `.values()[0]` if preferred
-
-    fetch("https://script.google.com/macros/s/AKfycbxQh9Lmv6hLSRR-A1nPESkF-uSkIt2hxTdTeRkXIBQlDdPQWc6l7g8NZt1DzzuMLbYZoQ/exec", {
-      method: "POST",
-      body: JSON.stringify({ data }),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }).then(() => console.log("✅ Data sent to Google Sheets"));
-  }
-});
-
-timeline.push({
-  type: "html-button-response",
-  stimulus: `<h2>Time's up! Thank you for participating!</h2>
-             <p><a href="https://app.prolific.co/submissions/complete?cc=YOUR_COMPLETION_CODE">Return to Prolific</a></p>`,
-  choices: []
-});
 
 // === 8. Start experiment ===
 jsPsych.init({
   timeline,
   on_finish: function () {
-    console.log(jsPsych.data.get().csv());
+    const data = jsPsych.data.get().csv();
+    fetch("https://script.google.com/macros/s/AKfycbx4D7hjHoh13WQGpcp1kCatnNNt_TA1GvNqG0sHQx0cA4m61ajIT-Ook4Q65yj1TN0A/exec", {
+      method: "POST",
+      body: JSON.stringify({ data }),
+      headers: { "Content-Type": "application/json" }
+    }).then(() => console.log("✅ Data sent to Google Sheets"));
+
+    console.log(data); // for debugging
   }
 });
+
+// Start a global timer that ends experiment after 15 minutes
+setTimeout(() => {
+  jsPsych.endExperiment(`
+    <h2>Time's up! Thank you for participating!</h2>
+    <p><a href="https://app.prolific.co/submissions/complete?cc=YOUR_COMPLETION_CODE">Return to Prolific</a></p>
+  `);
+}, 1 * 60 * 1000);
