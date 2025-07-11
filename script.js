@@ -290,6 +290,22 @@ for (let i = 0; i < maxTrials; i++) {
   timeline.push(generateTrial());
 }
 
+// === 7.5: Save data to Google Sheets ===
+timeline.push({
+  type: "call-function",
+  func: function () {
+    const data = jsPsych.data.get().csv(); // Or `.json()` or `.values()[0]` if preferred
+
+    fetch("https://script.google.com/macros/s/AKfycbxQh9Lmv6hLSRR-A1nPESkF-uSkIt2hxTdTeRkXIBQlDdPQWc6l7g8NZt1DzzuMLbYZoQ/exec", {
+      method: "POST",
+      body: JSON.stringify({ data }),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }).then(() => console.log("✅ Data sent to Google Sheets"));
+  }
+});
+
 timeline.push({
   type: "html-button-response",
   stimulus: `<h2>Time's up! Thank you for participating!</h2>
