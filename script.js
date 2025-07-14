@@ -294,7 +294,7 @@ jsPsych.init({
   timeline,
   on_finish: function () {
     const data = jsPsych.data.get().csv();
-    fetch("https://script.google.com/macros/s/AKfycby-HUAzJDq7VsBMvYWx6_QiJ6RhfD70dg1HdO4qGWzo9CytqK6NkbCeiOxoQZ5KYvZI/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbx4D7hjHoh13WQGpcp1kCatnNNt_TA1GvNqG0sHQx0cA4m61ajIT-Ook4Q65yj1TN0A/exec", {
       method: "POST",
       body: JSON.stringify({ data }),
       headers: { "Content-Type": "application/json" }
